@@ -1,5 +1,6 @@
 import { defineChart } from "@tanstack/charts";
 import { polar, radialArc } from "@tanstack/charts/polar";
+import { tooltip } from "@tanstack/charts/tooltip";
 import { Chart } from "@tanstack/preact-charts";
 import { pie } from "d3-shape";
 import { useMemo } from "preact/hooks";
@@ -58,6 +59,7 @@ export function PieChart({ config }: { config: PieChartConfig }) {
       margin: 0,
       x: null,
       y: null,
+      tooltip,
     });
   }, [rows]);
 

@@ -1,4 +1,5 @@
 import { defineChart, lineY } from "@tanstack/charts";
+import { tooltip } from "@tanstack/charts/tooltip";
 import { Chart } from "@tanstack/preact-charts";
 import { scaleLinear, scalePoint } from "d3-scale";
 import { useMemo } from "preact/hooks";
@@ -41,6 +42,7 @@ export function LineChart({ config }: { config: LineChartConfig }) {
         },
         clip: true,
       }),
+      tooltip,
     }),
     [points],
   );
