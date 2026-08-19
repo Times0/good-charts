@@ -1,0 +1,58 @@
+.tanstack-chart {
+  --ts-chart-1: #6366f1;
+  --ts-chart-2: #0891b2;
+  --ts-chart-3: #d97706;
+  --ts-chart-4: #db2777;
+  --ts-chart-5: #16a34a;
+  --ts-chart-6: #7c3aed;
+  color: var(--text-normal);
+  margin: 1rem 0;
+  max-width: 100%;
+}
+
+.tanstack-chart__title {
+  font-size: var(--font-ui-medium);
+  font-weight: var(--font-semibold);
+  margin: 0 0 0.5rem;
+  text-align: center;
+}
+
+.tanstack-chart__plot {
+  height: 300px;
+  min-width: 0;
+  width: 100%;
+}
+
+.tanstack-chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.9rem;
+  justify-content: center;
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+}
+
+.tanstack-chart__legend-item {
+  align-items: center;
+  color: var(--text-muted);
+  display: inline-flex;
+  font-size: var(--font-ui-small);
+  gap: 0.35rem;
+}
+
+.tanstack-chart__swatch {
+  background: var(--slice-color);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 50%;
+  height: 0.7rem;
+  width: 0.7rem;
+}
+
+.tanstack-chart-error {
+  background: var(--background-modifier-error);
+  border-left: 3px solid var(--text-error);
+  border-radius: var(--radius-s);
+  color: var(--text-error);
+  padding: 0.75rem 1rem;
+}
