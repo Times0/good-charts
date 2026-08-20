@@ -5,8 +5,8 @@ export interface ChartDatum {
   value: number;
 }
 
-export interface PieChartConfig {
-  type: "pie";
+export interface DonutChartConfig {
+  type: "donut";
   title?: string;
   legend: boolean;
   data: ChartDatum[];
@@ -18,11 +18,24 @@ export interface LineChartConfig {
   data: ChartDatum[];
 }
 
-export type ChartConfig = PieChartConfig | LineChartConfig;
+export interface BarChartConfig {
+  type: "bar";
+  title?: string;
+  data: ChartDatum[];
+}
 
-const PIE_KEYS = new Set(["type", "title", "legend", "data"]);
-const LINE_KEYS = new Set(["type", "title", "data"]);
+export interface AreaChartConfig {
+  type: "area";
+  title?: string;
+  data: ChartDatum[];
+}
+
+export type ChartConfig = DonutChartConfig | LineChartConfig | BarChartConfig | AreaChartConfig;
+
+const DONUT_KEYS = new Set(["type", "title", "legend", "data"]);
+const CARTESIAN_KEYS = new Set(["type", "title", "data"]);
 const DATUM_KEYS = new Set(["label", "value"]);
+const CHART_TYPES = new Set(["donut", "line", "bar", "area"]);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -46,11 +59,11 @@ export function parseChartConfig(source: string): ChartConfig {
     throw new Error("Chart configuration must be a YAML mapping.");
   }
 
-  if (raw.type !== "pie" && raw.type !== "line") {
-    throw new Error("type must be pie or line.");
+  if (typeof raw.type !== "string" || !CHART_TYPES.has(raw.type)) {
+    throw new Error("type must be donut, line, bar, or area.");
   }
 
-  const extraRootKeys = unknownKeys(raw, raw.type === "pie" ? PIE_KEYS : LINE_KEYS);
+  const extraRootKeys = unknownKeys(raw, raw.type === "donut" ? DONUT_KEYS : CARTESIAN_KEYS);
   if (extraRootKeys.length > 0) {
     throw new Error(`Unknown option${extraRootKeys.length === 1 ? "" : "s"}: ${extraRootKeys.join(", ")}.`);
   }
@@ -85,26 +98,31 @@ export function parseChartConfig(source: string): ChartConfig {
       throw new Error(`data[${index}].value must be a finite number.`);
     }
 
-    if (raw.type === "pie" && item.value < 0) {
+    if (raw.type === "donut" && item.value < 0) {
       throw new Error(`data[${index}].value cannot be negative.`);
     }
 
     return { label: item.label.trim(), value: item.value };
   });
 
-  if (raw.type === "pie" && data.every((item) => item.value === 0)) {
+  if (raw.type === "donut" && data.every((item) => item.value === 0)) {
     throw new Error("At least one slice must have a value greater than zero.");
   }
 
   const title = typeof raw.title === "string" ? raw.title.trim() : undefined;
 
-  if (raw.type === "line") {
+  if (raw.type === "line" || raw.type === "area") {
     if (data.length < 2) {
-      throw new Error("A line chart needs at least two points.");
+      const article = raw.type === "area" ? "An" : "A";
+      throw new Error(`${article} ${raw.type} chart needs at least two points.`);
     }
 
-    return { type: "line", title, data };
+    return { type: raw.type, title, data };
   }
 
-  return { type: "pie", title, legend: raw.legend ?? true, data };
+  if (raw.type === "bar") {
+    return { type: "bar", title, data };
+  }
+
+  return { type: "donut", title, legend: raw.legend ?? true, data };
 }

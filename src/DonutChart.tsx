@@ -4,7 +4,7 @@ import { tooltip } from "@tanstack/charts/tooltip";
 import { Chart } from "@tanstack/preact-charts";
 import { pie } from "d3-shape";
 import { useMemo } from "preact/hooks";
-import type { PieChartConfig } from "./parser";
+import type { DonutChartConfig } from "./parser";
 
 const COLORS = [
   "var(--ts-chart-1)",
@@ -15,25 +15,25 @@ const COLORS = [
   "var(--ts-chart-6)",
 ];
 
-interface PieSlice {
+interface DonutSlice {
   id: string;
   label: string;
   value: number;
   fill: string;
 }
 
-export function PieChart({ config }: { config: PieChartConfig }) {
-  const rows = useMemo<PieSlice[]>(
+export function DonutChart({ config }: { config: DonutChartConfig }) {
+  const rows = useMemo<DonutSlice[]>(
     () => config.data.map((item, index) => ({
       ...item,
       id: `${index}:${item.label}`,
       fill: COLORS[index % COLORS.length],
     })),
-    [config],
+    [config.data],
   );
 
   const definition = useMemo(() => {
-    const slices = pie<PieSlice>()
+    const slices = pie<DonutSlice>()
       .sort(null)
       .value((item) => item.value)(rows);
 
@@ -48,6 +48,7 @@ export function PieChart({ config }: { config: PieChartConfig }) {
               startAngle: "startAngle",
               endAngle: "endAngle",
               padAngle: "padAngle",
+              innerRadius: ({ radius }) => radius * 0.55,
               fill: (slice) => slice.data.fill,
               stroke: "var(--background-primary)",
               strokeWidth: 1.5,
@@ -64,11 +65,11 @@ export function PieChart({ config }: { config: PieChartConfig }) {
   }, [rows]);
 
   const ariaLabel = config.title
-    ? `${config.title} pie chart`
-    : `Pie chart showing ${rows.map((row) => row.label).join(", ")}`;
+    ? `${config.title} donut chart`
+    : `Donut chart showing ${rows.map((row) => row.label).join(", ")}`;
 
   return (
-    <figure class="tanstack-chart tanstack-chart--pie">
+    <figure class="tanstack-chart tanstack-chart--donut">
       {config.title ? <figcaption class="tanstack-chart__title">{config.title}</figcaption> : null}
       <div class="tanstack-chart__plot">
         <Chart

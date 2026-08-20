@@ -1,18 +1,18 @@
-import { defineChart, lineY } from "@tanstack/charts";
+import { barY, defineChart } from "@tanstack/charts";
 import { tooltip } from "@tanstack/charts/tooltip";
 import { Chart } from "@tanstack/preact-charts";
-import { scaleLinear, scalePoint } from "d3-scale";
+import { scaleBand, scaleLinear } from "d3-scale";
 import { useMemo } from "preact/hooks";
-import type { LineChartConfig } from "./parser";
+import type { BarChartConfig } from "./parser";
 
-interface LinePoint {
+interface BarPoint {
   id: string;
   label: string;
   value: number;
 }
 
-export function LineChart({ config }: { config: LineChartConfig }) {
-  const points = useMemo<LinePoint[]>(
+export function BarChart({ config }: { config: BarChartConfig }) {
+  const points = useMemo<BarPoint[]>(
     () => config.data.map((item, index) => ({ ...item, id: `${index}:${item.label}` })),
     [config.data],
   );
@@ -21,17 +21,18 @@ export function LineChart({ config }: { config: LineChartConfig }) {
     () => defineChart({
       chart: ({ width }) => ({
         marks: [
-          lineY(points, {
+          barY(points, {
             x: "label",
             y: "value",
             key: "id",
-            stroke: "var(--ts-chart-1)",
-            strokeWidth: 2.25,
-            points: true,
+            fill: "var(--ts-chart-1)",
+            inset: 2,
+            maxThickness: 56,
+            radius: 3,
           }),
         ],
         x: {
-          scale: () => scalePoint<string>().padding(0.35),
+          scale: () => scaleBand<string>().padding(0.16),
           ticks: width < 420 ? 4 : 7,
         },
         y: {
@@ -48,11 +49,11 @@ export function LineChart({ config }: { config: LineChartConfig }) {
   );
 
   const ariaLabel = config.title
-    ? `${config.title} line chart`
-    : `Line chart from ${points[0].label} to ${points.at(-1)?.label}`;
+    ? `${config.title} bar chart`
+    : `Bar chart comparing ${points.map((point) => point.label).join(", ")}`;
 
   return (
-    <figure class="tanstack-chart tanstack-chart--line">
+    <figure class="tanstack-chart tanstack-chart--bar">
       {config.title ? <figcaption class="tanstack-chart__title">{config.title}</figcaption> : null}
       <div class="tanstack-chart__plot">
         <Chart

@@ -1,18 +1,18 @@
-import { defineChart, lineY } from "@tanstack/charts";
+import { areaY, defineChart } from "@tanstack/charts";
 import { tooltip } from "@tanstack/charts/tooltip";
 import { Chart } from "@tanstack/preact-charts";
 import { scaleLinear, scalePoint } from "d3-scale";
 import { useMemo } from "preact/hooks";
-import type { LineChartConfig } from "./parser";
+import type { AreaChartConfig } from "./parser";
 
-interface LinePoint {
+interface AreaPoint {
   id: string;
   label: string;
   value: number;
 }
 
-export function LineChart({ config }: { config: LineChartConfig }) {
-  const points = useMemo<LinePoint[]>(
+export function AreaChart({ config }: { config: AreaChartConfig }) {
+  const points = useMemo<AreaPoint[]>(
     () => config.data.map((item, index) => ({ ...item, id: `${index}:${item.label}` })),
     [config.data],
   );
@@ -21,13 +21,14 @@ export function LineChart({ config }: { config: LineChartConfig }) {
     () => defineChart({
       chart: ({ width }) => ({
         marks: [
-          lineY(points, {
+          areaY(points, {
             x: "label",
             y: "value",
             key: "id",
+            fill: "var(--ts-chart-1)",
+            fillOpacity: 0.24,
             stroke: "var(--ts-chart-1)",
             strokeWidth: 2.25,
-            points: true,
           }),
         ],
         x: {
@@ -48,11 +49,11 @@ export function LineChart({ config }: { config: LineChartConfig }) {
   );
 
   const ariaLabel = config.title
-    ? `${config.title} line chart`
-    : `Line chart from ${points[0].label} to ${points.at(-1)?.label}`;
+    ? `${config.title} area chart`
+    : `Area chart from ${points[0].label} to ${points.at(-1)?.label}`;
 
   return (
-    <figure class="tanstack-chart tanstack-chart--line">
+    <figure class="tanstack-chart tanstack-chart--area">
       {config.title ? <figcaption class="tanstack-chart__title">{config.title}</figcaption> : null}
       <div class="tanstack-chart__plot">
         <Chart
