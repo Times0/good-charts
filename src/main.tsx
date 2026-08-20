@@ -16,7 +16,7 @@ class ChartRenderChild extends MarkdownRenderChild {
   }
 }
 
-export default class TanStackChartsPlugin extends Plugin {
+export default class GoodChartsPlugin extends Plugin {
   async onload(): Promise<void> {
     this.registerMarkdownCodeBlockProcessor("tanstack-chart", (source, el, context) => {
       let config;

@@ -1,9 +1,9 @@
 {
-  "id": "tanstack-charts",
-  "name": "TanStack Charts",
+  "id": "goodcharts",
+  "name": "GoodCharts",
   "version": "0.1.0",
   "minAppVersion": "1.5.0",
-  "description": "Render simple, theme-aware charts from YAML code blocks.",
-  "author": "BigVault",
+  "description": "Render simple, theme-aware charts from YAML using TanStack Charts.",
+  "author": "Times0",
   "isDesktopOnly": false
 }
