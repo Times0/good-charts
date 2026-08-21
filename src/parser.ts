@@ -12,10 +12,16 @@ export interface DonutChartConfig {
   data: ChartDatum[];
 }
 
+export interface LineChartDatum {
+  label: string;
+  value: number | null;
+  series: string;
+}
+
 export interface LineChartConfig {
   type: "line";
   title?: string;
-  data: ChartDatum[];
+  data: LineChartDatum[];
 }
 
 export interface BarChartConfig {
@@ -117,7 +123,15 @@ export function parseChartConfig(source: string): ChartConfig {
       throw new Error(`${article} ${raw.type} chart needs at least two points.`);
     }
 
-    return { type: raw.type, title, data };
+    if (raw.type === "line") {
+      return {
+        type: "line",
+        title,
+        data: data.map((item) => ({ ...item, series: title ?? "Series" })),
+      };
+    }
+
+    return { type: "area", title, data };
   }
 
   if (raw.type === "bar") {

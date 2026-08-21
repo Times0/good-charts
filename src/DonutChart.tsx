@@ -4,16 +4,8 @@ import { tooltip } from "@tanstack/charts/tooltip";
 import { Chart } from "@tanstack/preact-charts";
 import { pie } from "d3-shape";
 import { useMemo } from "preact/hooks";
+import { CHART_COLORS } from "./palette";
 import type { DonutChartConfig } from "./parser";
-
-const COLORS = [
-  "var(--ts-chart-1)",
-  "var(--ts-chart-2)",
-  "var(--ts-chart-3)",
-  "var(--ts-chart-4)",
-  "var(--ts-chart-5)",
-  "var(--ts-chart-6)",
-];
 
 interface DonutSlice {
   id: string;
@@ -27,7 +19,7 @@ export function DonutChart({ config }: { config: DonutChartConfig }) {
     () => config.data.map((item, index) => ({
       ...item,
       id: `${index}:${item.label}`,
-      fill: COLORS[index % COLORS.length],
+      fill: CHART_COLORS[index % CHART_COLORS.length],
     })),
     [config.data],
   );

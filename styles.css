@@ -56,3 +56,28 @@
   color: var(--text-error);
   padding: 0.75rem 1rem;
 }
+
+.goodcharts-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.goodcharts-toggle {
+  background: var(--interactive-normal);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: var(--font-ui-small);
+  padding: 0.2rem 0.6rem;
+}
+
+.goodcharts-toggle:hover {
+  background: var(--interactive-hover);
+  color: var(--text-normal);
+}
+
+.goodcharts-hidden {
+  display: none;
+}

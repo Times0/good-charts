@@ -1,19 +1,22 @@
-import { defineChart, lineY } from "@tanstack/charts";
+import { colorLegend, defineChart, lineY } from "@tanstack/charts";
 import { tooltip } from "@tanstack/charts/tooltip";
 import { Chart } from "@tanstack/preact-charts";
 import { scaleLinear, scalePoint } from "d3-scale";
 import { useMemo } from "preact/hooks";
-import type { LineChartConfig } from "./parser";
+import { CHART_COLORS } from "./palette";
+import type { LineChartConfig, LineChartDatum } from "./parser";
 
-interface LinePoint {
+interface LinePoint extends LineChartDatum {
   id: string;
-  label: string;
-  value: number;
 }
 
 export function LineChart({ config }: { config: LineChartConfig }) {
   const points = useMemo<LinePoint[]>(
     () => config.data.map((item, index) => ({ ...item, id: `${index}:${item.label}` })),
+    [config.data],
+  );
+  const series = useMemo(
+    () => Array.from(new Set(config.data.map((item) => item.series))),
     [config.data],
   );
 
@@ -24,8 +27,9 @@ export function LineChart({ config }: { config: LineChartConfig }) {
           lineY(points, {
             x: "label",
             y: "value",
+            z: "series",
+            color: "series",
             key: "id",
-            stroke: "var(--ts-chart-1)",
             strokeWidth: 2.25,
             points: true,
           }),
@@ -40,11 +44,16 @@ export function LineChart({ config }: { config: LineChartConfig }) {
           grid: true,
           ticks: width < 420 ? 4 : 6,
         },
+        color: {
+          domain: series,
+          range: CHART_COLORS,
+          legend: series.length > 1 ? colorLegend() : undefined,
+        },
         clip: true,
       }),
       tooltip,
     }),
-    [points],
+    [points, series],
   );
 
   const ariaLabel = config.title
