@@ -22,6 +22,25 @@ data:
     });
   });
 
+  test("accepts numeric labels and stores them as strings", () => {
+    expect(parseChartConfig(`
+type: line
+title: Temperature
+data:
+  - label: 2020
+    value: -2
+  - label: 2021
+    value: 7.5
+`)).toEqual({
+      type: "line",
+      title: "Temperature",
+      data: [
+        { label: "2020", value: -2, series: "Temperature" },
+        { label: "2021", value: 7.5, series: "Temperature" },
+      ],
+    });
+  });
+
   test("parses a line chart with negative values", () => {
     expect(parseChartConfig(`
 type: line
