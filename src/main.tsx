@@ -68,7 +68,7 @@ export default class GoodChartsPlugin extends Plugin {
     table.parentElement?.insertBefore(toolbar, table);
     table.insertAdjacentElement("afterend", chartMount);
 
-    let chartVisible = false;
+    let chartVisible = true;
 
     const applyMode = (): void => {
       if (chartVisible) {

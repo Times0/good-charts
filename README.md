@@ -45,7 +45,7 @@ Every data point requires a non-empty `label` and a finite numeric `value`. Donu
 
 ## Turn a table into a chart
 
-Any markdown table with a label column and at least one numeric column gets a **Show chart / Show table** button in reading view. The first column becomes the X-axis, and every remaining numeric column becomes a line on a single chart.
+Any markdown table with a label column and at least one numeric column is shown as a chart in reading view, with a **Show table / Show chart** button to switch back. The first column becomes the X-axis, and every remaining numeric column becomes a line on a single chart.
 
 ```markdown
 | Year | Optimistic | Normal | Pessimistic |
