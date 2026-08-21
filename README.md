@@ -43,6 +43,24 @@ data:
 
 Every data point requires a non-empty `label` and a finite numeric `value`. Donut values cannot be negative, and line and area charts require at least two data points. The `legend` option is available for donut charts and defaults to `true`.
 
+## Turn a table into a chart
+
+Any markdown table with a label column and at least one numeric column gets a **Show chart / Show table** button in reading view. The first column becomes the X-axis, and every remaining numeric column becomes a line on a single chart.
+
+```markdown
+| Year | Optimistic | Normal | Pessimistic |
+|------|------------|--------|-------------|
+| 2026 | 1.4        | 1.4    | 1.4         |
+| 2046 | 1.7        | 1.9    | 2.2         |
+| 2076 | 1.9        | 2.4    | 3.2         |
+| 2100 | 1.9        | 2.7    | 4.1         |
+| 2126 | 1.8        | 2.8    | 4.7         |
+```
+
+The table above renders as one line chart with three lines and a legend. A table with a single numeric column renders as one line without a legend.
+
+The button toggles the current reading view between the table and the chart without changing the note. Numeric cells may include thousands separators (for example `1,200`); empty or non-numeric cells create a gap in that line.
+
 ## Installation
 
 Once the plugin is listed in the Obsidian Community directory:

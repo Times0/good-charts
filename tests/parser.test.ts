@@ -35,8 +35,8 @@ data:
       type: "line",
       title: "Temperature",
       data: [
-        { label: "Morning", value: -2 },
-        { label: "Afternoon", value: 7 },
+        { label: "Morning", value: -2, series: "Temperature" },
+        { label: "Afternoon", value: 7, series: "Temperature" },
       ],
     });
   });
