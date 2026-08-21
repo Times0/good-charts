@@ -51,6 +51,22 @@ function unknownKeys(value: Record<string, unknown>, allowed: Set<string>): stri
   return Object.keys(value).filter((key) => !allowed.has(key));
 }
 
+function parseLabel(value: unknown, index: number): string {
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) {
+      throw new Error(`data[${index}].label must be a non-empty string or finite number.`);
+    }
+
+    return String(value);
+  }
+
+  if (typeof value !== "string" || value.trim() === "") {
+    throw new Error(`data[${index}].label must be a non-empty string or finite number.`);
+  }
+
+  return value.trim();
+}
+
 export function parseChartConfig(source: string): ChartConfig {
   let raw: unknown;
 
@@ -96,9 +112,7 @@ export function parseChartConfig(source: string): ChartConfig {
       throw new Error(`Unknown data[${index}] option${extraDatumKeys.length === 1 ? "" : "s"}: ${extraDatumKeys.join(", ")}.`);
     }
 
-    if (typeof item.label !== "string" || item.label.trim() === "") {
-      throw new Error(`data[${index}].label must be a non-empty string.`);
-    }
+    const label = parseLabel(item.label, index);
 
     if (typeof item.value !== "number" || !Number.isFinite(item.value)) {
       throw new Error(`data[${index}].value must be a finite number.`);
@@ -108,7 +122,7 @@ export function parseChartConfig(source: string): ChartConfig {
       throw new Error(`data[${index}].value cannot be negative.`);
     }
 
-    return { label: item.label.trim(), value: item.value };
+    return { label, value: item.value };
   });
 
   if (raw.type === "donut" && data.every((item) => item.value === 0)) {
