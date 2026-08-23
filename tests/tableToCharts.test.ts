@@ -1,54 +1,62 @@
 import { describe, expect, test } from "bun:test";
-import { tableMatrixToLineChart } from "../src/tableToCharts";
+import { compileChartInput } from "../src/chart";
+import { tableMatrixToChartInput } from "../src/tableToCharts";
 
-describe("tableMatrixToLineChart", () => {
-  test("turns a multi-column table into one chart with a series per numeric column", () => {
-    const config = tableMatrixToLineChart({
+describe("tableMatrixToChartInput", () => {
+  test("turns numeric columns into one multi-series line chart input", () => {
+    const input = tableMatrixToChartInput({
       headers: ["Year", "Optimistic", "Normal", "Pessimistic"],
       rows: [
         ["2026", "1.4", "1.4", "1.4"],
         ["2046", "1.7", "1.9", "2.2"],
         ["2076", "1.9", "2.4", "3.2"],
-        ["2100", "1.9", "2.7", "4.1"],
-        ["2126", "1.8", "2.8", "4.7"],
       ],
     });
 
-    expect(config).not.toBeNull();
-    expect(config?.type).toBe("line");
-    expect(Array.from(new Set(config?.data.map((item) => item.series)))).toEqual([
-      "Optimistic",
-      "Normal",
-      "Pessimistic",
-    ]);
-    expect(config?.data.filter((item) => item.series === "Optimistic")).toEqual([
-      { label: "2026", value: 1.4, series: "Optimistic" },
-      { label: "2046", value: 1.7, series: "Optimistic" },
-      { label: "2076", value: 1.9, series: "Optimistic" },
-      { label: "2100", value: 1.9, series: "Optimistic" },
-      { label: "2126", value: 1.8, series: "Optimistic" },
-    ]);
-  });
-
-  test("turns a two-column table into a single-series line chart", () => {
-    const config = tableMatrixToLineChart({
-      headers: ["Year", "Value"],
-      rows: [
-        ["2026", "1.4"],
-        ["2046", "1.7"],
+    expect(input).toMatchObject({
+      ariaLabel: "Line chart of Optimistic, Normal, Pessimistic by Year",
+      marks: [
+        {
+          lineY: {
+            x: "label",
+            y: "value",
+            z: "series",
+            key: "id",
+            points: true,
+          },
+        },
       ],
+      x: {
+        scale: "point",
+        axis: { label: "Year" },
+      },
+      y: {
+        scale: "linear",
+        nice: true,
+        grid: true,
+      },
+      clip: true,
     });
 
-    expect(config).not.toBeNull();
-    expect(config?.type).toBe("line");
-    expect(config?.data).toEqual([
-      { label: "2026", value: 1.4, series: "Value" },
-      { label: "2046", value: 1.7, series: "Value" },
+    expect(input?.data).toEqual([
+      { id: "1:0", label: "2026", value: 1.4, series: "Optimistic" },
+      { id: "1:1", label: "2046", value: 1.7, series: "Optimistic" },
+      { id: "1:2", label: "2076", value: 1.9, series: "Optimistic" },
+      { id: "2:0", label: "2026", value: 1.4, series: "Normal" },
+      { id: "2:1", label: "2046", value: 1.9, series: "Normal" },
+      { id: "2:2", label: "2076", value: 2.4, series: "Normal" },
+      { id: "3:0", label: "2026", value: 1.4, series: "Pessimistic" },
+      { id: "3:1", label: "2046", value: 2.2, series: "Pessimistic" },
+      { id: "3:2", label: "2076", value: 3.2, series: "Pessimistic" },
     ]);
+
+    const chart = compileChartInput(input);
+    expect(chart.ariaLabel).toBe("Line chart of Optimistic, Normal, Pessimistic by Year");
+    expect(chart.height).toBe(300);
   });
 
-  test("strips thousands separators from numbers", () => {
-    const config = tableMatrixToLineChart({
+  test("strips thousands separators", () => {
+    const input = tableMatrixToChartInput({
       headers: ["Year", "Population"],
       rows: [
         ["2026", "1,200"],
@@ -56,14 +64,14 @@ describe("tableMatrixToLineChart", () => {
       ],
     });
 
-    expect(config?.data).toEqual([
-      { label: "2026", value: 1200, series: "Population" },
-      { label: "2046", value: 1700, series: "Population" },
+    expect(input?.data).toEqual([
+      { id: "1:0", label: "2026", value: 1200, series: "Population" },
+      { id: "1:1", label: "2046", value: 1700, series: "Population" },
     ]);
   });
 
-  test("skips columns that lack at least two numeric cells", () => {
-    const config = tableMatrixToLineChart({
+  test("skips columns without two numeric cells", () => {
+    const input = tableMatrixToChartInput({
       headers: ["Year", "Note", "Value"],
       rows: [
         ["2026", "start", "1.4"],
@@ -71,14 +79,14 @@ describe("tableMatrixToLineChart", () => {
       ],
     });
 
-    expect(config?.data).toEqual([
-      { label: "2026", value: 1.4, series: "Value" },
-      { label: "2046", value: 1.7, series: "Value" },
+    expect(input?.data).toEqual([
+      { id: "2:0", label: "2026", value: 1.4, series: "Value" },
+      { id: "2:1", label: "2046", value: 1.7, series: "Value" },
     ]);
   });
 
   test("keeps missing values as gaps", () => {
-    const config = tableMatrixToLineChart({
+    const input = tableMatrixToChartInput({
       headers: ["Year", "Value"],
       rows: [
         ["2026", "1.4"],
@@ -87,40 +95,27 @@ describe("tableMatrixToLineChart", () => {
       ],
     });
 
-    expect(config?.data).toEqual([
-      { label: "2026", value: 1.4, series: "Value" },
-      { label: "2046", value: null, series: "Value" },
-      { label: "2076", value: 1.9, series: "Value" },
+    expect(input?.data).toEqual([
+      { id: "1:0", label: "2026", value: 1.4, series: "Value" },
+      { id: "1:1", label: "2046", value: null, series: "Value" },
+      { id: "1:2", label: "2076", value: 1.9, series: "Value" },
     ]);
   });
 
-  test("returns null for text-only tables", () => {
-    expect(
-      tableMatrixToLineChart({
-        headers: ["Name", "Role"],
-        rows: [
-          ["Ada", "Engineer"],
-          ["Grace", "Admiral"],
-        ],
-      }),
-    ).toBeNull();
-  });
-
-  test("returns null when there is only one body row", () => {
-    expect(
-      tableMatrixToLineChart({
-        headers: ["Year", "Value"],
-        rows: [["2026", "1.4"]],
-      }),
-    ).toBeNull();
-  });
-
-  test("returns null when there are fewer than two columns", () => {
-    expect(
-      tableMatrixToLineChart({
-        headers: ["Year"],
-        rows: [["2026"], ["2046"]],
-      }),
-    ).toBeNull();
+  test.each([
+    {
+      headers: ["Name", "Role"],
+      rows: [["Ada", "Engineer"], ["Grace", "Admiral"]],
+    },
+    {
+      headers: ["Year", "Value"],
+      rows: [["2026", "1.4"]],
+    },
+    {
+      headers: ["Year"],
+      rows: [["2026"], ["2046"]],
+    },
+  ])("returns null for unsuitable tables", (matrix) => {
+    expect(tableMatrixToChartInput(matrix)).toBeNull();
   });
 });

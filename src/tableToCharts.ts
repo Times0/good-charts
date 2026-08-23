@@ -1,8 +1,6 @@
-import type { LineChartConfig, LineChartDatum } from "./parser";
-
 export interface TableMatrix {
-  headers: string[];
-  rows: string[][];
+  headers: readonly string[];
+  rows: readonly (readonly string[])[];
 }
 
 function parseNumber(raw: string): number | null {
@@ -15,7 +13,7 @@ function parseNumber(raw: string): number | null {
   return Number.isFinite(value) ? value : null;
 }
 
-export function tableMatrixToLineChart({ headers, rows }: TableMatrix): LineChartConfig | null {
+export function tableMatrixToChartInput({ headers, rows }: TableMatrix): Record<string, unknown> | null {
   if (headers.length < 2 || rows.length < 2) {
     return null;
   }
@@ -25,7 +23,8 @@ export function tableMatrixToLineChart({ headers, rows }: TableMatrix): LineChar
     return null;
   }
 
-  const data: LineChartDatum[] = [];
+  const data: Record<string, unknown>[] = [];
+  const seriesNames: string[] = [];
 
   for (let column = 1; column < headers.length; column += 1) {
     const name = (headers[column] ?? "").trim();
@@ -33,24 +32,53 @@ export function tableMatrixToLineChart({ headers, rows }: TableMatrix): LineChar
       continue;
     }
 
-    const series = rows.map((row, rowIndex) => ({
-      label: labels[rowIndex],
-      value: parseNumber(row[column] ?? ""),
-      series: name,
-    }));
-
-    if (series.filter((item) => item.value !== null).length >= 2) {
-      data.push(...series);
+    const values = rows.map((row) => parseNumber(row[column] ?? ""));
+    if (values.filter((value) => value !== null).length < 2) {
+      continue;
     }
+
+    seriesNames.push(name);
+    data.push(
+      ...values.map((value, rowIndex) => ({
+        id: `${column}:${rowIndex}`,
+        label: labels[rowIndex],
+        value,
+        series: name,
+      })),
+    );
   }
 
   if (data.length === 0) {
     return null;
   }
 
+  const category = (headers[0] ?? "").trim() || "Category";
+
   return {
-    type: "line",
+    ariaLabel: `Line chart of ${seriesNames.join(", ")} by ${category}`,
     data,
+    marks: [
+      {
+        lineY: {
+          x: "label",
+          y: "value",
+          z: "series",
+          key: "id",
+          strokeWidth: 2.25,
+          points: true,
+        },
+      },
+    ],
+    x: {
+      scale: "point",
+      axis: { label: category },
+    },
+    y: {
+      scale: "linear",
+      nice: true,
+      grid: true,
+    },
+    clip: true,
   };
 }
 
@@ -58,7 +86,7 @@ function cellText(cell: Element): string {
   return (cell.textContent ?? "").trim();
 }
 
-export function htmlTableToMatrix(table: HTMLTableElement): TableMatrix {
+function htmlTableToMatrix(table: HTMLTableElement): TableMatrix {
   const headerCells = Array.from(table.querySelectorAll("thead th, thead td"));
   const bodyRowEls = Array.from(table.querySelectorAll("tbody tr"));
 
@@ -80,6 +108,6 @@ export function htmlTableToMatrix(table: HTMLTableElement): TableMatrix {
   return { headers, rows };
 }
 
-export function htmlTableToLineChart(table: HTMLTableElement): LineChartConfig | null {
-  return tableMatrixToLineChart(htmlTableToMatrix(table));
+export function htmlTableToChartInput(table: HTMLTableElement): Record<string, unknown> | null {
+  return tableMatrixToChartInput(htmlTableToMatrix(table));
 }

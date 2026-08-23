@@ -1,9 +1,9 @@
 {
   "id": "goodcharts",
   "name": "GoodCharts",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "minAppVersion": "1.5.0",
-  "description": "Render simple, theme-aware charts from YAML using TanStack Charts.",
+  "description": "Render composable, theme-aware charts from YAML using TanStack Charts.",
   "author": "Times0",
   "isDesktopOnly": false
 }
