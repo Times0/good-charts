@@ -33,11 +33,14 @@ marks:
       x: week
       y1: expectedLow
       y2: expectedHigh
+      fill: "#bfdbfe"
+      stroke: cornflowerblue
       fillOpacity: 0.22
       curve: monotoneX
 
   - ruleY:
       data: [70]
+      stroke: slategray
       strokeWidth: 2
       strokeDasharray: 7 7
 
@@ -45,6 +48,7 @@ marks:
       data: weeks
       x: week
       y: activation
+      stroke: "#2563eb"
       strokeWidth: 4
       points: true
       curve: monotoneX
@@ -108,7 +112,36 @@ The only curve helper is `curve: monotoneX`. Band scales include sensible spacin
 
 Optional Obsidian presentation fields are `title`, `height`, and `ariaLabel`. Height defaults to 300 pixels, and the accessible label falls back to the title and then `Chart`.
 
-Other static axis, grid, layout, and mark options are passed to TanStack Charts. Colors use TanStack's defaults.
+Other static axis, grid, layout, and mark options are passed to TanStack Charts.
+
+### Colors
+
+Use TanStack's mark paint options to set one fixed color: `stroke` for lines and rules, `fill` for bars, areas, dots, and text. Areas and bars can use both. Provide a raw CSS color string, preferably a quoted hex value or a CSS color name:
+
+```yaml
+marks:
+  - barY:
+      x: category
+      y: value
+      fill: "#0f766e"
+      stroke: darkslategray
+```
+
+To choose the colors for grouped series, use TanStack's chart-level `color.domain` and `color.range`. The domain fixes which series receives each color; omit it when data order is sufficient. A mark's `z` or `color` channel supplies the series values:
+
+```yaml
+color:
+  domain: [Actual, Forecast]
+  range: ["#2563eb", tomato]
+
+marks:
+  - lineY:
+      x: week
+      y: value
+      z: series
+```
+
+Hex colors must be quoted because `#` starts a YAML comment. CSS variable expressions are not needed; use raw hex colors or CSS color names. If `color` is omitted, TanStack's default palette is used.
 
 GoodCharts never evaluates JavaScript from notes. It does not support accessors, responsive builders, date/time scales, tick formatters, transforms, polar marks, or configured scale instances.
 
@@ -124,7 +157,7 @@ Any Markdown table with a label column and at least one numeric column is shown 
 | 2076 | 1.9        | 2.4    | 3.2         |
 ```
 
-Multiple numeric columns become separate series using TanStack's automatic colors. Thousands separators are accepted, and empty or non-numeric cells create gaps. Toggling the view never changes the note.
+Multiple numeric columns become separate series using TanStack's automatic colors. For a custom table-chart palette, write an equivalent `goodcharts` block and set `color.range`. Thousands separators are accepted, and empty or non-numeric cells create gaps. Toggling the view never changes the note.
 
 ## Installation
 

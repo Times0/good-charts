@@ -23,6 +23,7 @@ marks:
   - lineY:
       x: week
       y: value
+      stroke: "#2563eb"
       points: true
       curve: monotoneX
 
@@ -47,10 +48,34 @@ Each `marks` item has exactly one mark name. Put its channels and static TanStac
 - Use a root mapping of named arrays only when marks need different data; select one with `data: name`.
 - Inline data is useful for annotations such as `ruleY: { data: [70] }`.
 - Channel names such as `x: week` and `y: value` must match data fields.
-- Use `z` for automatic multi-series grouping. Let TanStack choose colors; do not add custom color settings.
+- Use `z` for multi-series grouping. Let TanStack choose colors unless the user asks for custom colors.
 - Optional root fields are `title`, `height`, and `ariaLabel`. Height defaults to 300.
 - Tooltips are on by default; use `tooltip: false` when they add no value.
 - `curve: monotoneX` is the only curve helper.
+
+## Colors
+
+Keep color configuration in TanStack's native shape:
+
+- Set a fixed mark color with `stroke` for lines and rules, or `fill` for bars, areas, dots, and text. Areas and bars may use both.
+- For grouped series, set root `color.range` and keep `z` or `color` on the mark as the grouping channel.
+- Add `color.domain` when each named series must receive a specific range color; domain and range positions correspond.
+- Prefer quoted raw hex values such as `"#2563eb"` or CSS names such as `tomato`. Do not emit CSS `var(...)` expressions.
+- Keep hex values quoted because an unquoted `#` starts a YAML comment.
+
+```yaml
+color:
+  domain: [Actual, Forecast]
+  range: ["#2563eb", tomato]
+
+marks:
+  - lineY:
+      x: week
+      y: value
+      z: series
+```
+
+Do not invent palette names or wrappers. GoodCharts supports only `domain` and `range` inside root `color`; it does not expose configured color scales or legends.
 
 GoodCharts never evaluates JavaScript. Do not emit functions, accessors, formatters, responsive builders, transforms, polar marks, or configured scale instances.
 

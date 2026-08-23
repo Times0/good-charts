@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
   createChartScene,
+  type SceneNode,
   type StaticChartDefinition,
 } from "@tanstack/charts";
 import { type BandScale } from "@tanstack/charts/scales/band";
@@ -16,6 +17,12 @@ function staticDefinition(chart: CompiledChart): StaticChartDefinition {
     throw new Error("Expected a static chart definition.");
   }
   return chart.definition;
+}
+
+function flattenNodes(nodes: readonly SceneNode[]): SceneNode[] {
+  return nodes.flatMap((node) => (
+    node.kind === "group" ? [node, ...flattenNodes(node.children)] : [node]
+  ));
 }
 
 describe("compileChartSource", () => {
@@ -199,6 +206,83 @@ tooltip: false
     expect(definition.tooltip).toBe(false);
   });
 
+  test("uses TanStack color domain and range for grouped series", () => {
+    const chart = compileChartSource(`
+data:
+  - {x: A, y: 1, series: Actual}
+  - {x: B, y: 2, series: Actual}
+  - {x: A, y: 2, series: Forecast}
+  - {x: B, y: 3, series: Forecast}
+marks:
+  - lineY:
+      x: x
+      y: y
+      z: series
+x: {scale: point}
+y: {scale: linear}
+color:
+  domain: [Forecast, Actual]
+  range: ["#f97316", steelblue]
+`);
+
+    const scene = createChartScene(staticDefinition(chart), { width: 640, height: 300 });
+    expect(scene.colors).toMatchObject({
+      domain: ["Forecast", "Actual"],
+      range: ["#f97316", "steelblue"],
+    });
+    expect(scene.points.map((point) => point.color)).toEqual([
+      "steelblue",
+      "steelblue",
+      "#f97316",
+      "#f97316",
+    ]);
+  });
+
+  test("passes fixed fill and stroke colors directly to TanStack marks", () => {
+    const chart = compileChartSource(`
+data:
+  - {x: A, y: 2, low: 1, high: 3, label: Alpha}
+  - {x: B, y: 4, low: 2, high: 5, label: Beta}
+marks:
+  - areaY: {x: x, y1: low, y2: high, fill: "#bfdbfe", stroke: royalblue}
+  - barY: {x: x, y: y, fill: tomato, stroke: maroon}
+  - dot: {x: x, y: y, fill: gold, stroke: "#713f12"}
+  - lineY: {x: x, y: y, stroke: "#0f766e"}
+  - ruleY: {data: [3], stroke: rebeccapurple}
+  - text: {x: x, y: y, text: label, fill: navy}
+x: {scale: band}
+y: {scale: linear}
+`);
+
+    const nodes = flattenNodes(
+      createChartScene(staticDefinition(chart), { width: 640, height: 300 }).nodes,
+    );
+    expect(nodes.some((node) => (
+      node.kind === "area"
+      && node.style?.fill === "#bfdbfe"
+      && node.style.stroke === "royalblue"
+    ))).toBe(true);
+    expect(nodes.some((node) => (
+      node.kind === "rect"
+      && node.style?.fill === "tomato"
+      && node.style.stroke === "maroon"
+    ))).toBe(true);
+    expect(nodes.some((node) => (
+      node.kind === "dot"
+      && node.style?.fill === "gold"
+      && node.style.stroke === "#713f12"
+    ))).toBe(true);
+    expect(nodes.some((node) => (
+      node.kind === "polyline" && node.style?.stroke === "#0f766e"
+    ))).toBe(true);
+    expect(nodes.some((node) => (
+      node.kind === "rule" && node.style?.stroke === "rebeccapurple"
+    ))).toBe(true);
+    expect(nodes.some((node) => (
+      node.kind === "label" && node.style?.fill === "navy"
+    ))).toBe(true);
+  });
+
   test("uses presentation defaults", () => {
     const chart = compileChartSource(`
 data: [1]
@@ -226,6 +310,9 @@ y:
     ["unknown curves", "data: [{x: A, y: 1}]\nmarks:\n  - lineY: {x: x, y: y, curve: step}", "Unknown curve \"step\""],
     ["unknown data", "data: {rows: []}\nmarks:\n  - dot: {data: missing}", "unknown data set \"missing\""],
     ["malformed marks", "data: []\nmarks:\n  - lineY: {}\n    dot: {}", "exactly one named mark"],
+    ["malformed color options", "data: [1]\nmarks: [{ruleY: {}}]\ncolor: red", "color must be an options mapping"],
+    ["empty color range", "data: [1]\nmarks: [{ruleY: {}}]\ncolor: {range: []}", "color.range must be a non-empty array"],
+    ["non-string mark paint", "data: [1]\nmarks: [{ruleY: {stroke: 42}}]", "ruleY.stroke must be a non-empty CSS color string"],
   ])("reports %s", (_name, source, message) => {
     expect(() => compileChartSource(source)).toThrow(message);
   });

@@ -107,6 +107,15 @@ function resolveMarkData(
   throw new Error(`${markName}.data must be a named data set or an inline array.`);
 }
 
+function validateMarkPaints(options: RecordValue, markName: string): void {
+  for (const paint of ["fill", "stroke"] as const) {
+    const value = options[paint];
+    if (value !== undefined && (typeof value !== "string" || value.trim() === "")) {
+      throw new Error(`${markName}.${paint} must be a non-empty CSS color string.`);
+    }
+  }
+}
+
 function compileMark(value: unknown, sources: DataSources, index: number): DynamicMark {
   if (!isRecord(value) || Object.keys(value).length !== 1) {
     throw new Error(`marks[${index}] must contain exactly one named mark.`);
@@ -124,6 +133,7 @@ function compileMark(value: unknown, sources: DataSources, index: number): Dynam
   }
 
   const { data: dataReference, curve, ...options } = rawOptions;
+  validateMarkPaints(options, markName);
   if (curve !== undefined) {
     if (curve !== "monotoneX") {
       throw new Error(`Unknown curve "${typeof curve === "string" ? curve : typeof curve}".`);
@@ -132,6 +142,42 @@ function compileMark(value: unknown, sources: DataSources, index: number): Dynam
   }
 
   return (factory as MarkFactory)(resolveMarkData(dataReference, sources, markName), options);
+}
+
+function compileColor(value: unknown): unknown {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (!isRecord(value)) {
+    throw new Error("color must be an options mapping.");
+  }
+
+  const keys = Object.keys(value);
+  if (keys.some((key) => key !== "domain" && key !== "range")) {
+    throw new Error("color only supports domain and range.");
+  }
+
+  if (value.domain !== undefined) {
+    if (
+      !Array.isArray(value.domain)
+      || value.domain.some((entry) => (
+        typeof entry !== "string"
+        && (typeof entry !== "number" || !Number.isFinite(entry))
+      ))
+    ) {
+      throw new Error("color.domain must be an array of strings or finite numbers.");
+    }
+  }
+
+  if (
+    !Array.isArray(value.range)
+    || value.range.length === 0
+    || value.range.some((entry) => typeof entry !== "string" || entry.trim() === "")
+  ) {
+    throw new Error("color.range must be a non-empty array of CSS color strings.");
+  }
+
+  return value;
 }
 
 function compileAxis(value: unknown, axis: "x" | "y"): unknown {
@@ -192,6 +238,7 @@ export function compileChartInput(value: unknown): CompiledChart {
     ariaLabel: _ariaLabel,
     data: _data,
     tooltip: tooltipEnabled,
+    color,
     x,
     y,
     ...options
@@ -200,6 +247,7 @@ export function compileChartInput(value: unknown): CompiledChart {
   const spec = {
     ...options,
     marks,
+    color: compileColor(color),
     x: compileAxis(x, "x"),
     y: compileAxis(y, "y"),
     tooltip: tooltipEnabled === false ? false : tooltip,
