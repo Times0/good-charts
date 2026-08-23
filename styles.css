@@ -1,10 +1,9 @@
 .tanstack-chart {
-  --ts-chart-1: #6366f1;
-  --ts-chart-2: #0891b2;
-  --ts-chart-3: #d97706;
-  --ts-chart-4: #db2777;
-  --ts-chart-5: #16a34a;
-  --ts-chart-6: #7c3aed;
+  --ts-chart-tooltip-background: var(--background-primary);
+  --ts-chart-tooltip-color: var(--text-normal);
+  --ts-chart-tooltip-border: 1px solid var(--background-modifier-border);
+  --ts-chart-tooltip-border-radius: var(--radius-s);
+  --ts-chart-tooltip-shadow: var(--shadow-s);
   color: var(--text-normal);
   margin: 1rem 0;
   max-width: 100%;
@@ -18,35 +17,8 @@
 }
 
 .tanstack-chart__plot {
-  height: 300px;
   min-width: 0;
   width: 100%;
-}
-
-.tanstack-chart__legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem 0.9rem;
-  justify-content: center;
-  list-style: none;
-  margin: 0.6rem 0 0;
-  padding: 0;
-}
-
-.tanstack-chart__legend-item {
-  align-items: center;
-  color: var(--text-muted);
-  display: inline-flex;
-  font-size: var(--font-ui-small);
-  gap: 0.35rem;
-}
-
-.tanstack-chart__swatch {
-  background: var(--slice-color);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 50%;
-  height: 0.7rem;
-  width: 0.7rem;
 }
 
 .tanstack-chart-error {
@@ -60,22 +32,23 @@
 .goodcharts-toolbar {
   display: flex;
   justify-content: flex-end;
-  margin: 0.5rem 0 0.25rem;
+  margin: 0;
 }
 
 .goodcharts-toggle {
-  background: var(--interactive-normal);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: var(--radius-s);
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: var(--font-ui-small);
-  padding: 0.2rem 0.6rem;
+  color: var(--text-faint);
+  height: var(--icon-s);
+  opacity: 0.45;
+  padding: 0;
+  width: var(--icon-s);
 }
 
-.goodcharts-toggle:hover {
-  background: var(--interactive-hover);
-  color: var(--text-normal);
+.goodcharts-toggle:hover,
+.goodcharts-toggle:focus-visible {
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-muted);
+  opacity: 1;
 }
 
 .goodcharts-hidden {
