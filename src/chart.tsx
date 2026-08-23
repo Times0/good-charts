@@ -226,9 +226,9 @@ export function compileChartSource(source: string): CompiledChart {
 
 export function ChartView({ chart }: { chart: CompiledChart }) {
   return (
-    <figure class="tanstack-chart">
-      {chart.title ? <figcaption class="tanstack-chart__title">{chart.title}</figcaption> : null}
-      <div class="tanstack-chart__plot" style={{ height: `${chart.height}px` }}>
+    <figure class="goodcharts-chart">
+      {chart.title ? <figcaption class="goodcharts-chart__title">{chart.title}</figcaption> : null}
+      <div class="goodcharts-chart__plot" style={{ height: `${chart.height}px` }}>
         <Chart
           definition={chart.definition}
           height={chart.height}

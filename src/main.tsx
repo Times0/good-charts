@@ -25,7 +25,7 @@ class ChartRenderChild extends MarkdownRenderChild {
 
 function showError(el: HTMLElement, error: unknown): void {
   el.empty();
-  el.addClass("tanstack-chart-error");
+  el.addClass("goodcharts-error");
   el.setAttribute("role", "alert");
   el.setText(error instanceof Error ? error.message : String(error));
 }
@@ -36,16 +36,18 @@ function mountChart(chart: CompiledChart, mountEl: HTMLElement): void {
 
 export default class GoodChartsPlugin extends Plugin {
   async onload(): Promise<void> {
-    this.registerMarkdownCodeBlockProcessor("tanstack-chart", (source, el, context) => {
-      try {
-        const chart = compileChartSource(source);
-        const mountEl = el.createDiv();
-        mountChart(chart, mountEl);
-        context.addChild(new ChartRenderChild(el, mountEl));
-      } catch (error) {
-        showError(el, error);
-      }
-    });
+    for (const language of ["goodcharts", "tanstack-chart"]) {
+      this.registerMarkdownCodeBlockProcessor(language, (source, el, context) => {
+        try {
+          const chart = compileChartSource(source);
+          const mountEl = el.createDiv();
+          mountChart(chart, mountEl);
+          context.addChild(new ChartRenderChild(el, mountEl));
+        } catch (error) {
+          showError(el, error);
+        }
+      });
+    }
 
     this.registerMarkdownPostProcessor((el, context) => {
       for (const table of el.querySelectorAll("table")) {
@@ -81,7 +83,7 @@ export default class GoodChartsPlugin extends Plugin {
       cls: "clickable-icon goodcharts-toggle",
       attr: { type: "button" },
     });
-    const chartMount = createDiv({ cls: "goodcharts-chart" });
+    const chartMount = createDiv({ cls: "goodcharts-table-chart" });
 
     table.parentElement?.insertBefore(toolbar, table);
     table.insertAdjacentElement("afterend", chartMount);

@@ -1,6 +1,6 @@
 # GoodCharts
 
-Build composable charts from YAML code blocks in Obsidian using [TanStack Charts](https://github.com/TanStack/charts).
+GoodCharts is an Obsidian plugin for creating powerful, composable charts from YAML. It is powered by [TanStack Charts](https://tanstack.com/charts/latest) under the hood.
 
 GoodCharts exposes a small declarative version of TanStack's chart grammar instead of separate chart components. Layer marks, select scales, and pass ordinary static TanStack options directly from YAML. Charts include accessible labels and show tooltips by default.
 
@@ -8,10 +8,10 @@ This is an independent community plugin and is not affiliated with or endorsed b
 
 ## Composable chart blocks
 
-Create a fenced `tanstack-chart` block:
+Create a fenced `goodcharts` block:
 
 ````markdown
-```tanstack-chart
+```goodcharts
 title: Activation rate
 height: 340
 ariaLabel: Weekly activation rate with expected range and goal
@@ -138,18 +138,18 @@ For manual installation, download `main.js`, `manifest.json`, and `styles.css` f
 
 ## Agent skill
 
-This repository includes an [Agent Skill](./skills/obsidian-tanstack-charts/SKILL.md) that teaches compatible coding agents how to create GoodCharts blocks and chart-ready Markdown tables.
+This repository includes a [GoodCharts Agent Skill](./skills/goodcharts/SKILL.md) that teaches compatible coding agents how to create GoodCharts blocks and chart-ready Markdown tables.
 
 Install it from this public GitHub repository and choose the target agent and installation scope when prompted:
 
 ```bash
-npx skills add Times0/obsidian-tanstack-charts
+npx skills add Times0/good-charts
 ```
 
 To install it globally for Codex without prompts:
 
 ```bash
-npx skills add Times0/obsidian-tanstack-charts --skill obsidian-tanstack-charts --agent codex --global --yes
+npx skills add Times0/good-charts --skill goodcharts --agent codex --global --yes
 ```
 
 ## Development
@@ -169,7 +169,7 @@ bun run deploy --vault=/path/to/vault
 
 ## Acknowledgements
 
-Chart rendering is powered by [TanStack Charts](https://github.com/TanStack/charts), Preact, and D3 Shape.
+Chart rendering is powered by [TanStack Charts](https://tanstack.com/charts/latest), Preact, and D3 Shape.
 
 ## License
 
@@ -177,4 +177,4 @@ GoodCharts is available under the [MIT License](./LICENSE).
 
 ## Support
 
-Please use the repository's [issue tracker](https://github.com/Times0/obsidian-tanstack-charts/issues) to report bugs or request features.
+Please use the repository's [issue tracker](https://github.com/Times0/good-charts/issues) to report bugs or request features.

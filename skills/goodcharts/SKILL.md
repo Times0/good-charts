@@ -1,15 +1,15 @@
 ---
-name: obsidian-tanstack-charts
-description: Create or edit GoodCharts tanstack-chart YAML blocks and chart-ready Markdown tables in Obsidian. Use for charts rendered by the GoodCharts plugin, not for generic TanStack Charts application code.
+name: goodcharts
+description: Create or edit GoodCharts YAML chart blocks and chart-ready Markdown tables in Obsidian. Use when authoring charts for the GoodCharts plugin, not for generic TanStack Charts application code.
 ---
 
-# Obsidian TanStack Charts
+# GoodCharts
 
-Author GoodCharts blocks while preserving unrelated note content.
+Author powerful, composable GoodCharts charts while preserving unrelated note content.
 
 ## Chart block
 
-Use a fenced `tanstack-chart` block with data, at least one mark, and its positional scales:
+Use a fenced `goodcharts` block with data, at least one mark, and its positional scales:
 
 ```yaml
 title: Weekly activation
@@ -32,6 +32,8 @@ y:
   scale: linear
   grid: true
 ```
+
+Prefer `goodcharts` for new blocks. The legacy `tanstack-chart` language remains supported for existing notes.
 
 Marks: `lineY`, `areaY`, `barY`, `dot`, `ruleX`, `ruleY`, `text`.
 

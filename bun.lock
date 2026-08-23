@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "obsidian-goodcharts",
+      "name": "goodcharts",
       "dependencies": {
         "@tanstack/charts": "0.14.0",
         "@tanstack/preact-charts": "0.14.0",

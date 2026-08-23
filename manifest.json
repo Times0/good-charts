@@ -3,7 +3,7 @@
   "name": "GoodCharts",
   "version": "0.3.0",
   "minAppVersion": "1.5.0",
-  "description": "Render composable, theme-aware charts from YAML using TanStack Charts.",
+  "description": "Create powerful, composable charts in Obsidian, powered by TanStack Charts.",
   "author": "Times0",
   "isDesktopOnly": false
 }
