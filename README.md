@@ -1,250 +1,76 @@
-<div align="center">
-
 # GoodCharts
 
-### Charts your agents can write. Charts your notes can keep.
+### Turn the data in your Obsidian notes into clear, interactive stories.
 
-Create expressive, composable charts in Obsidian from readable YAML—or turn an ordinary Markdown table into a chart with one click.
+No spreadsheet detours. No chart software to learn. Keep your evidence, writing, and visuals together in one note.
 
-[![GitHub release](https://img.shields.io/github/v/release/Times0/good-charts?style=flat-square&color=7c3aed)](https://github.com/Times0/good-charts/releases/latest)
-[![MIT License](https://img.shields.io/badge/license-MIT-7c3aed?style=flat-square)](./LICENSE)
-[![Powered by TanStack Charts](https://img.shields.io/badge/powered%20by-TanStack%20Charts-7c3aed?style=flat-square)](https://tanstack.com/charts/latest)
+![GitHub release](https://img.shields.io/github/v/release/Times0/good-charts?style=flat-square&color=7c3aed)
+![MIT License](https://img.shields.io/badge/license-MIT-7c3aed?style=flat-square)
 
-</div>
+![GoodCharts scrolling through a page of real interactive chart examples in Obsidian](./docs/assets/full-page-demo.webp)
 
-![GoodCharts rendering a layered activation chart inside an Obsidian-style workspace](./docs/assets/goodcharts-hero.png)
+## See the story in your data
 
-## Built for agents, by design
+GoodCharts helps you:
 
-GoodCharts is primarily an authoring surface for agents. Its plain-text YAML is easy to generate, review, diff, and keep in a note—without asking an agent to write JavaScript or modify your vault UI.
+- **Spot trends** while researching or taking notes
+- **Compare evidence** without leaving Obsidian
+- **Call out turning points** that matter to your story
+- **Keep charts connected to their source data**
+- **Ask an AI assistant** to create richer visuals for you
 
-The repository includes a [GoodCharts Agent Skill](./skills/goodcharts/SKILL.md) with the supported grammar, composition patterns, and guardrails. Install it with any compatible agent-skills client:
+Ideal for journalists, students, researchers, writers, and anyone who thinks in notes—not dashboards.
 
-```bash
-npx skills add Times0/good-charts
-```
+## From table to chart in one click
 
-Humans can write the same blocks directly; the format is intentionally small enough to understand at a glance.
+Write or paste a simple table, then switch between the source data and an interactive chart. Your table stays intact and editable.
 
-## Philosophy: one grammar, many charts
+![An Obsidian table switching into an interactive chart](./docs/assets/toggle-showcase.webp)
 
-[TanStack Charts](https://tanstack.com/charts/latest) is built around a composable chart grammar rather than a shelf of fixed chart components. That is exactly the right foundation for agent-authored charts: combine marks, scales, data, and annotations to express the story instead of searching for a narrowly named chart type.
+Update a number in your note and the chart updates with it. Hover to explore values, then switch back to the table whenever you want to check the evidence.
 
-GoodCharts exposes a focused, safe subset of that grammar in YAML today, while keeping the door open to far more chart forms as TanStack Charts evolves.
+## Answer real questions visually
 
-## Quick start
+**Are we moving toward the goal?**
 
-Add a fenced `goodcharts` block to any note:
+![A weekly activation chart showing progress toward a goal](./docs/assets/simple-areachart_lineachart.webp)
 
-````markdown
-```goodcharts
-title: Weekly activation
-height: 320
+**What changed—and what caused it?**
 
-data:
-  - week: Week 1
-    activation: 64
-  - week: Week 2
-    activation: 71
-  - week: Week 3
-    activation: 68
-  - week: Week 4
-    activation: 76
-
-marks:
-  - lineY:
-      x: week
-      y: activation
-      stroke: "#7c3aed"
-      strokeWidth: 4
-      points: true
-      curve: monotoneX
+![A customer satisfaction chart highlighting the moments that changed the trend](./docs/assets/linechart-with-dots.webp)
 
-x:
-  scale: point
-  axis:
-    label: Week
+**Where should we act first?**
 
-y:
-  scale: linear
-  nice: true
-  grid: true
-```
-````
+![An opportunity map that compares ideas by impact and effort](./docs/assets/complex-chart.webp)
 
-GoodCharts renders it in reading view with an accessible label and tooltips by default. The note remains portable Markdown and YAML.
+Compare outcomes, show goals, and mark important events—all beside the notes that explain them.
 
-## Markdown table in, interactive chart out
+## Start in three steps
 
-Already have data in a table? Leave it there. Any Markdown table with a label column and at least one numeric column becomes a chart in reading view. The first column is the X-axis; every numeric column becomes a line series.
+1. Install and enable GoodCharts in Obsidian.
+2. Add a table to a note.
+3. Open Reading view and select the chart button.
 
-![GoodCharts toggling an Obsidian note between a chart and its source Markdown table](./docs/assets/table-chart-toggle.gif)
+That is enough for your first chart.
 
-```markdown
-| Year | Optimistic | Normal | Pessimistic |
-|------|------------|--------|-------------|
-| 2026 | 1.4        | 1.4    | 1.4         |
-| 2046 | 1.7        | 1.9    | 2.2         |
-| 2076 | 1.9        | 2.4    | 3.2         |
-```
+## Want something more expressive?
 
-The **Show table / Show chart** toggle only changes the view. It never rewrites the note. Thousands separators are accepted, and empty or non-numeric cells create gaps.
+Ask your AI assistant for a GoodCharts visual in plain language:
 
-## Compose the story you need
+> “Turn these survey results into a chart and highlight the two biggest changes.”
 
-![Three GoodCharts examples: a bar chart, layered area and line chart, and an annotated line and dot chart](./docs/assets/chart-gallery.png)
+The included [GoodCharts Agent Skill](./skills/goodcharts/SKILL.md) helps compatible AI assistants create custom charts safely while keeping everything readable in your note.
 
-Marks are layers. Put several in one block to build richer explanations:
+## Install
 
-| Intent | Compose | Recommended X scale |
-|---|---|---|
-| Compare categories | `barY` | `band` |
-| Show a trend | `lineY` or `lineY` + `dot` | `point` or `linear` |
-| Show a range | `areaY` + `lineY` | `point` or `linear` |
-| Add a target | `ruleY` + any data mark | match the data mark |
-| Label an event | `ruleX` + `text` | match the data mark |
-
-Here is the pattern behind the hero image: an expected range, a target, and the actual result are three independent layers sharing one chart.
-
-````markdown
-```goodcharts
-title: Activation rate
-ariaLabel: Weekly activation rate with expected range and goal
+Until GoodCharts is available in Obsidian's Community Plugins directory, download the files from the [latest release](https://github.com/Times0/good-charts/releases/latest) and copy them to:
 
-data:
-  weeks:
-    - { week: Week 1, activation: 64, low: 58, high: 70 }
-    - { week: Week 2, activation: 71, low: 62, high: 76 }
-    - { week: Week 3, activation: 68, low: 64, high: 78 }
-    - { week: Week 4, activation: 76, low: 66, high: 80 }
+`<your-vault>/.obsidian/plugins/goodcharts/`
 
-marks:
-  - areaY:
-      data: weeks
-      x: week
-      y1: low
-      y2: high
-      fill: "#8b5cf6"
-      fillOpacity: 0.15
-      curve: monotoneX
+Reload Obsidian, then enable **GoodCharts** under **Settings → Community plugins**.
 
-  - ruleY:
-      data: [80]
-      stroke: slategray
-      strokeDasharray: 7 7
+---
 
-  - lineY:
-      data: weeks
-      x: week
-      y: activation
-      stroke: "#7c3aed"
-      strokeWidth: 4
-      points: true
-      curve: monotoneX
+Have an idea or found a problem? [Open an issue](https://github.com/Times0/good-charts/issues).
 
-x:
-  scale: point
-y:
-  scale: linear
-  nice: true
-  grid: true
-```
-````
-
-<details>
-<summary><strong>Grammar reference</strong></summary>
-
-### Marks and scales
-
-Supported marks are `lineY`, `areaY`, `barY`, `dot`, `ruleX`, `ruleY`, and `text`.
-
-Supported scales are `linear`, `band`, and `point`. Use `band` for bars; GoodCharts adds sensible spacing automatically. `curve: monotoneX` is the available curve helper.
-
-Optional Obsidian presentation fields are `title`, `height`, and `ariaLabel`. Height defaults to 300 pixels. The accessible label falls back to the title and then to `Chart`. Set `tooltip: false` to disable the default tooltip.
-
-### Data shapes
-
-Use a root array when every mark shares one data set. Marks inherit it when they omit `data`:
-
-```yaml
-data:
-  - { category: A, value: 12 }
-  - { category: B, value: 18 }
-
-marks:
-  - barY:
-      x: category
-      y: value
-
-x:
-  scale: band
-y:
-  scale: linear
-```
-
-Use a root mapping when marks need different named data sets, then select one with `data: name`. Inline arrays are useful for annotations such as `ruleY: { data: [80] }`.
-
-### Colors
-
-Use `stroke` for lines and rules, and `fill` for bars, areas, dots, and text. Quote hex values because `#` begins a YAML comment.
-
-For grouped series, use TanStack's chart-level `color.domain` and `color.range`; a mark's `z` or `color` channel supplies the series value:
-
-```yaml
-color:
-  domain: [Actual, Forecast]
-  range: ["#2563eb", tomato]
-
-marks:
-  - lineY:
-      x: week
-      y: value
-      z: series
-```
-
-When `color` is omitted, TanStack Charts supplies its default palette.
-
-### Safety and current scope
-
-GoodCharts never evaluates JavaScript from notes. Functions, accessors, responsive builders, tick formatters, transforms, polar marks, date/time scales, and configured scale instances are not currently supported. Other static axis, grid, layout, and mark options pass through to TanStack Charts.
-
-</details>
-
-## Installation
-
-### Obsidian Community Plugins
-
-Once GoodCharts is available in the community directory:
-
-1. Open **Settings → Community plugins**.
-2. Select **Browse** and search for **GoodCharts**.
-3. Select **Install**, then **Enable**.
-
-### Manual installation
-
-Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/Times0/good-charts/releases/latest). Put them in `<vault>/.obsidian/plugins/goodcharts/`, reload Obsidian, and enable the plugin.
-
-## Development
-
-GoodCharts uses [Bun](https://bun.sh/):
-
-```bash
-bun install
-bun run verify
-```
-
-`bun run build` creates `main.js` in the repository root. To deploy a development build to a vault, pass the vault directory or set `OBSIDIAN_VAULT`:
-
-```bash
-bun run deploy --vault=/path/to/vault
-```
-
-## Contributing
-
-Contributions are welcome. Keep changes focused, add or update tests for behavior, and run `bun run verify` before opening a pull request. For visual changes, include a screenshot or short recording so reviewers can evaluate the result quickly. Bugs and feature ideas belong in the [issue tracker](https://github.com/Times0/good-charts/issues).
-
-## Acknowledgements
-
-Rendering is powered by [TanStack Charts](https://tanstack.com/charts/latest), Preact, and D3 Shape. GoodCharts is an independent community plugin and is not affiliated with or endorsed by TanStack or Obsidian.
-
-Released under the [MIT License](./LICENSE).
+Powered by [TanStack Charts](https://tanstack.com/charts/latest). Released under the [MIT License](./LICENSE).
