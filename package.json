@@ -4,7 +4,7 @@
   "packageManager": "bun@1.3.8",
   "private": true,
   "license": "MIT",
-  "description": "Create powerful, composable charts in Obsidian, powered by TanStack Charts",
+  "description": "Create powerful, composable charts, powered by TanStack Charts",
   "scripts": {
     "build": "bun run esbuild.config.mjs",
     "deploy": "bun run esbuild.config.mjs --deploy",
