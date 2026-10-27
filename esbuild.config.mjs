@@ -1,10 +1,9 @@
 import { build } from "esbuild";
 import { builtinModules } from "node:module";
 import { copyFile, mkdir } from "node:fs/promises";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 
-const projectRoot = dirname(fileURLToPath(import.meta.url));
+const projectRoot = import.meta.dirname;
 const isDeploy = process.argv.includes("--deploy");
 const vaultArgument = process.argv.find((argument) => argument.startsWith("--vault="));
 const vaultRoot = vaultArgument?.slice("--vault=".length) || process.env.OBSIDIAN_VAULT;

@@ -2,22 +2,11 @@ import { describe, expect, test } from "bun:test";
 import {
   createChartScene,
   type SceneNode,
-  type StaticChartDefinition,
 } from "@tanstack/charts";
 import { type BandScale } from "@tanstack/charts/scales/band";
 import { scaleLinear } from "@tanstack/charts/scales/linear";
 import { scalePoint } from "@tanstack/charts/scales/point";
-import {
-  compileChartSource,
-  type CompiledChart,
-} from "../src/chart";
-
-function staticDefinition(chart: CompiledChart): StaticChartDefinition {
-  if ("chart" in chart.definition) {
-    throw new Error("Expected a static chart definition.");
-  }
-  return chart.definition;
-}
+import { compileChartSource } from "../src/chart";
 
 function flattenNodes(nodes: readonly SceneNode[]): SceneNode[] {
   return nodes.flatMap((node) => (
@@ -63,20 +52,22 @@ margin: 12
       ariaLabel: "Weekly values line chart",
     });
 
-    const definition = staticDefinition(chart);
+    const definition = chart.definition;
     expect(definition.marks).toHaveLength(1);
-    expect(definition.x?.scale).toBe(scalePoint);
-    expect(definition.y?.scale).toBe(scaleLinear);
+    expect(definition.scales?.x?.scale).toBe(scalePoint);
+    expect(definition.scales?.y?.scale).toBe(scaleLinear);
     expect(definition).toMatchObject({
       clip: true,
       margin: 12,
-      x: {
-        axis: { label: "Week" },
-        grid: false,
-      },
-      y: {
-        nice: true,
-        grid: true,
+      scales: {
+        x: {
+          axis: { label: "Week" },
+          grid: false,
+        },
+        y: {
+          nice: true,
+          grid: true,
+        },
       },
     });
     expect(definition.tooltip).not.toBe(false);
@@ -137,7 +128,10 @@ y:
   scale: linear
 `);
 
-    expect(staticDefinition(chart).marks).toHaveLength(7);
+    const definition = chart.definition;
+    expect(definition.marks).toHaveLength(7);
+    const scene = createChartScene(definition, { width: 640, height: 300 });
+    expect(scene.points.length).toBeGreaterThan(0);
   });
 
   test.each([
@@ -158,7 +152,7 @@ y:
   scale: linear
 `);
 
-    expect(staticDefinition(chart).x?.scale).toBe(scale);
+    expect(chart.definition.scales?.x?.scale).toBe(scale);
   });
 
   test("pads band scales by default so bars do not touch", () => {
@@ -180,7 +174,7 @@ y:
   scale: linear
 `);
 
-    const scale = (staticDefinition(chart).x?.scale as () => BandScale)();
+    const scale = (chart.definition.scales?.x?.scale as () => BandScale)();
     expect(scale.padding()).toBe(0.2);
   });
 
@@ -202,7 +196,7 @@ y:
 tooltip: false
 `);
 
-    const definition = staticDefinition(chart);
+    const definition = chart.definition;
     expect(definition.tooltip).toBe(false);
   });
 
@@ -225,7 +219,7 @@ color:
   range: ["#f97316", steelblue]
 `);
 
-    const scene = createChartScene(staticDefinition(chart), { width: 640, height: 300 });
+    const scene = createChartScene(chart.definition, { width: 640, height: 300 });
     expect(scene.colors).toMatchObject({
       domain: ["Forecast", "Actual"],
       range: ["#f97316", "steelblue"],
@@ -255,7 +249,7 @@ y: {scale: linear}
 `);
 
     const nodes = flattenNodes(
-      createChartScene(staticDefinition(chart), { width: 640, height: 300 }).nodes,
+      createChartScene(chart.definition, { width: 640, height: 300 }).nodes,
     );
     expect(nodes.some((node) => (
       node.kind === "area"

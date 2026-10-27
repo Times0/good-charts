@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { createChartScene } from "@tanstack/charts";
 import { compileChartInput } from "../src/chart";
 import { tableMatrixToChartInput } from "../src/tableToCharts";
 
@@ -53,6 +54,10 @@ describe("tableMatrixToChartInput", () => {
     const chart = compileChartInput(input);
     expect(chart.ariaLabel).toBe("Line chart of Optimistic, Normal, Pessimistic by Year");
     expect(chart.height).toBe(300);
+
+    const scene = createChartScene(chart.definition, { width: 640, height: chart.height });
+    expect(scene.points).toHaveLength(9);
+    expect(scene.colors.domain).toEqual(["Optimistic", "Normal", "Pessimistic"]);
   });
 
   test("strips thousands separators", () => {

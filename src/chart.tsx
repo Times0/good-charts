@@ -2,21 +2,22 @@ import {
   areaY,
   barY,
   d3Curve,
-  defineChart,
   dot,
   lineY,
   ruleX,
   ruleY,
   text,
+  type ChartColorOptions,
   type ChartMark,
+  type ChartPositionScaleOptions,
   type ChartValue,
-  type DomChartDefinition,
+  type StaticChartDefinition,
 } from "@tanstack/charts";
 import { scaleBand } from "@tanstack/charts/scales/band";
 import { scaleLinear } from "@tanstack/charts/scales/linear";
 import { scalePoint } from "@tanstack/charts/scales/point";
 import { tooltip } from "@tanstack/charts/tooltip";
-import { Chart } from "@tanstack/preact-charts";
+import { Chart } from "@tanstack/charts/preact";
 import { curveMonotoneX } from "d3-shape";
 import { parse } from "yaml";
 
@@ -46,7 +47,7 @@ interface DataSources {
 }
 
 export interface CompiledChart {
-  definition: DomChartDefinition;
+  definition: StaticChartDefinition<unknown, ChartValue, ChartValue, "dom">;
   title?: string;
   height: number;
   ariaLabel: string;
@@ -144,7 +145,7 @@ function compileMark(value: unknown, sources: DataSources, index: number): Dynam
   return (factory as MarkFactory)(resolveMarkData(dataReference, sources, markName), options);
 }
 
-function compileColor(value: unknown): unknown {
+function compileColor(value: unknown): ChartColorOptions | undefined {
   if (value === undefined) {
     return undefined;
   }
@@ -180,9 +181,9 @@ function compileColor(value: unknown): unknown {
   return value;
 }
 
-function compileAxis(value: unknown, axis: "x" | "y"): unknown {
+function compileAxis(value: unknown, axis: "x" | "y"): ChartPositionScaleOptions | null {
   if (value === null || value === undefined) {
-    return value;
+    return null;
   }
   if (!isRecord(value)) {
     throw new Error(`${axis} must be an options mapping or null.`);
@@ -244,17 +245,19 @@ export function compileChartInput(value: unknown): CompiledChart {
     ...options
   } = value;
 
-  const spec = {
+  const definition: CompiledChart["definition"] = {
     ...options,
     marks,
     color: compileColor(color),
-    x: compileAxis(x, "x"),
-    y: compileAxis(y, "y"),
+    scales: {
+      x: compileAxis(x, "x"),
+      y: compileAxis(y, "y"),
+    },
     tooltip: tooltipEnabled === false ? false : tooltip,
   };
 
   return {
-    definition: defineChart(spec as never) as unknown as DomChartDefinition,
+    definition,
     title,
     height,
     ariaLabel,
